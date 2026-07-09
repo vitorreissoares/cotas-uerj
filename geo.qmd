@@ -1,0 +1,5 @@
+---
+title: "Georreferencimento"
+---
+
+O código de georreferenciamento foi desenvolvido, produzimos o georreferenciamento dos estudantes inscritos no Proiniciar. Para ampliar a análise será necessário obter a base de CEPs dos estudantes, informação que ainda não está disponível.

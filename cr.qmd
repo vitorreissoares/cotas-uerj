@@ -1,0 +1,5 @@
+---
+title: "CR"
+---
+
+Ainda é necessário obter acesso às informações do SAG referentes ao Coeficiente de Rendimento (CR), que permitam o cruzamento com as demais bases de dados e a construção de indicadores acadêmicos.

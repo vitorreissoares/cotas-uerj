@@ -1,0 +1,7 @@
+---
+title: "Perfil"
+---
+
+O formulário de coleta de dados foi aplicado e as respostas encontram-se disponíveis.
+
+Próxima etapa: Desenvolver uma apresentação automatizada dos resultados.

@@ -1,0 +1,638 @@
+---
+title: "Ingresso"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(plotly)
+
+library(ggplot2)
+library(sf)
+library(geobr)
+library(geocodebr)
+
+
+library(crosstalk)
+library(htmltools)
+
+```
+
+```{r}
+# ------------------------------------------------------------------
+# 1. Ler todos os arquivos Excel da pasta
+# ------------------------------------------------------------------
+
+path <- "dados/ingressante"
+
+arquivos_ingressante <- list.files(
+  path = path,
+  pattern = "\\.xlsx$",
+  full.names = TRUE
+)
+
+# ------------------------------------------------------------------
+# 2. Criar uma base com todos os ingressantes
+# ------------------------------------------------------------------
+
+base_ingressante <- arquivos_ingressante |>
+  map(read_excel) |>
+  list_rbind()
+```
+
+```{r}
+# ------------------------------------------------------------------
+# 3. Limpar nomes dos cursos e renomear colunas
+# ------------------------------------------------------------------
+
+base_ingressante <- base_ingressante |>
+  mutate(
+    curso = trimws(curso),
+    curso = str_remove(curso, "\\.$")
+  )
+
+# ------------------------------------------------------------------
+# 4. Transformar modalidades de ingresso em formato longo
+# ------------------------------------------------------------------
+
+base_ingressante_long <- base_ingressante |>
+  pivot_longer(
+    cols = c(
+      não_cota,
+      cota_negro,
+      cota_rede_pública,
+      cota_deficiente,
+      cota_filho,
+      cota_indio,
+      cota_deficiente_ou_indigena,
+      cota_hipossuficencia,
+      cota_outras
+    ),
+    names_to = "modalidade",
+    values_to = "quantidade"
+  )
+
+
+```
+
+```{r}
+
+# ------------------------------------------------------------------
+# Agregar em duas categorias: Não cota x Cotas (Total Geral)
+# ------------------------------------------------------------------
+
+base_ingressante_cota_ncota <- base_ingressante |>
+  mutate(
+    cotas = cota_negro +
+      cota_rede_pública +
+      cota_deficiente +
+      cota_filho +
+      cota_indio +
+      cota_deficiente_ou_indigena +
+      cota_hipossuficencia +
+      cota_outras
+  ) |>
+  select(
+    ano,
+    não_cota,
+    cotas
+  ) |>
+  pivot_longer(
+    cols = c(não_cota, cotas),
+    names_to = "modalidade",
+    values_to = "quantidade"
+  ) |>
+  group_by(ano, modalidade) |>
+  summarise(
+    quantidade = sum(quantidade, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+```
+
+```{r}
+# ------------------------------------------------------------------
+# Gráfico cotistas x não cotistas
+# ------------------------------------------------------------------
+
+fig_ingressante <- plot_ly(
+  base_ingressante_cota_ncota,
+  x = ~factor(ano),
+  y = ~quantidade,
+  color = ~modalidade,
+  colors = c("#4E79A7", "#E15759"),
+  type = "bar",
+  hovertemplate = paste(
+  "<b>%{fullData.name}</b><br>",
+  "Ano: %{x}<br>",
+  "Ingressantes: %{y:,.0f}<extra></extra>"
+)
+) |>
+  layout(
+    title = list(
+      text = "<b> </b>",
+      x = 0.5
+    ),
+    barmode = "group",
+    template = "plotly_white",
+    hovermode = "x unified",
+    xaxis = list(
+      title = " "
+    ),
+    yaxis = list(
+      title = " ",
+      tickformat = ",d",
+      separatethousands = TRUE
+    ),
+    legend = list(
+      title = list(text = ""),
+      orientation = "h",
+      x = 0.3,
+      y = -0.2
+    )
+  )
+
+# colocar fonte
+
+fig_ingressante <- fig_ingressante |>
+  layout(
+    annotations = list(
+      list(
+        text = "Fonte: SAG EA00122 em 09 de Julho de 2026",
+        x = 1, # ajuste horizontal (1 = a direita 0.30)
+        y = -0.28, # ajuste vertical
+        xref = "paper",
+        yref = "paper",
+        xanchor = "right",
+        yanchor = "top",
+        showarrow = FALSE,
+        font = list(size = 11, color = "gray40")
+      )
+    ),
+    margin = list(b = 80)  # aumenta a margem inferior
+  )
+
+fig_ingressante
+
+```
+
+### por centro setorial
+
+```{r}
+# ------------------------------------------------------------------
+# 1. Agregar por ano, centro, modalidade e quantidade
+# ------------------------------------------------------------------
+
+ano_centro_ingressante <- base_ingressante_long |>
+  group_by(ano, centro, modalidade) |>
+  summarise(
+    quantidade = sum(quantidade, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(centro, modalidade, ano)
+
+# Alterar nomes das legendas
+
+ano_centro_ingressante <- ano_centro_ingressante |>
+  mutate(
+    modalidade = recode(
+      modalidade,
+      "cota_negro" = "Racial",
+      "cota_rede_pública" = "Rede pública",
+      "cota_deficiente" = "PCD",
+      "cota_filho" = "Filho",
+      "cota_indio" = "Indígena",
+      "cota_deficiente_ou_indigena" = "PCD ou Indígena",
+      "cota_hipossuficencia" = "Hipossuficiência",
+      "cota_outras" = "Outras",
+      "não_cota" = "Ampla"
+    )
+  )
+
+# ------------------------------------------------------------------
+# 2. Dados compartilhados
+# ------------------------------------------------------------------
+
+shared_centro_ingressante <- SharedData$new(
+  ano_centro_ingressante,
+  group = "centro_ingressante"
+)
+
+# ------------------------------------------------------------------
+# 3. Filtros
+# ------------------------------------------------------------------
+
+filtro_centro_ingressante <-
+  filter_select(
+    id = "centro",
+    label = "Centro Setorial",
+    sharedData = shared_centro_ingressante,
+    group = ~centro,
+    multiple = FALSE
+  )
+
+
+```
+
+```{r}
+
+# ------------------------------------------------------------------
+# 4. Gráfico
+# ------------------------------------------------------------------
+
+fig_centro_ingressante <-
+  plot_ly(
+    shared_centro_ingressante,
+    x = ~ano,
+    y = ~quantidade,
+    color = ~modalidade,
+    colors = "Dark2",
+
+    type = "scatter",
+    mode = "lines+markers",
+
+    hovertemplate =
+      paste(
+        "<b>%{customdata}</b><br>",
+        "Ano: %{x}<br>",
+        "Quantidade: %{y}<extra></extra>"
+      ),
+
+    customdata = ~centro
+  ) |>
+
+  layout(
+
+    title = list(
+      text = "<b> </b>",
+      x = 0.5
+    ),
+
+    template = "plotly_white",
+
+    hovermode = "x unified",
+
+    xaxis = list(
+      title = "",
+      tickmode = "linear"
+    ),
+# não mostrar k para 1000
+    yaxis = list(
+      title = " ",
+      tickformat = ",d",
+      separatethousands = TRUE
+    ),
+
+    legend = list(
+      orientation = "h",
+      x = 0,
+      y = -0.25,
+      title = list(text = "")
+    )
+  )
+
+# ------------------------------------------------------------------
+# 5. Iniciar sem mostrar todas as variáveis
+# ------------------------------------------------------------------
+
+# Faz todas as séries iniciarem ocultas
+fig_centro_ingressante <- plotly_build(fig_centro_ingressante)
+
+for(i in seq_along(fig_centro_ingressante$x$data)) {
+  fig_centro_ingressante$x$data[[i]]$visible <- "legendonly"
+}
+
+
+# colocar fonte
+
+fig_centro_ingressante <- fig_centro_ingressante |>
+  layout(
+    annotations = list(
+      list(
+        text = "Fonte: SAG EA00122 em 09 de Julho de 2026",
+        x = 1, # 0.33
+        y = -0.46,
+        xref = "paper",
+        yref = "paper",
+        xanchor = "right",
+        yanchor = "top",
+        showarrow = FALSE,
+        font = list(size = 11, color = "gray40")
+      )
+    ),
+    margin = list(b = 80)  # aumenta a margem inferior
+  )
+
+fig_centro_ingressante
+filtro_centro_ingressante
+
+```
+
+### por unidade
+
+```{r}
+# ------------------------------------------------------------------
+# 1. Agregar por ano, unidade, modalidade e quantidade ***
+# ------------------------------------------------------------------
+
+ano_unidade_ingressante <- base_ingressante_long |>
+  group_by(ano, unidade, modalidade) |>
+  summarise(
+    quantidade = sum(quantidade, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(unidade, modalidade, ano)
+
+# Alterar nomes das legendas
+
+ano_unidade_ingressante <- ano_unidade_ingressante |>
+  mutate(
+    modalidade = recode(
+      modalidade,
+      "cota_negro" = "Racial",
+      "cota_rede_pública" = "Rede pública",
+      "cota_deficiente" = "PCD",
+      "cota_filho" = "Filho",
+      "cota_indio" = "Indígena",
+      "cota_deficiente_ou_indigena" = "PCD ou Indígena",
+      "cota_hipossuficencia" = "Hipossuficiência",
+      "cota_outras" = "Outras",
+      "não_cota" = "Ampla"
+    )
+  )
+
+# ------------------------------------------------------------------
+# 2. Dados compartilhados
+# ------------------------------------------------------------------
+
+shared_unidade_ingressante <- SharedData$new(
+  ano_unidade_ingressante,
+  group = "unidade_ingressante"
+)
+
+# ------------------------------------------------------------------
+# 3. Filtros
+# ------------------------------------------------------------------
+
+filtro_unidade_ingressante <-
+  filter_select(
+    id = "unidade",
+    label = "Unidade Acadêmica",
+    sharedData = shared_unidade_ingressante,
+    group = ~unidade,
+    multiple = FALSE
+  )
+```
+
+```{r}
+# ------------------------------------------------------------------
+# 4. Gráfico
+# ------------------------------------------------------------------
+
+fig_unidade_ingressante <-
+  plot_ly(
+    shared_unidade_ingressante,
+    x = ~ano,
+    y = ~quantidade,
+    color = ~modalidade,
+    colors = "Dark2",
+
+    type = "scatter",
+    mode = "lines+markers",
+
+    hovertemplate =
+      paste(
+        "<b>%{customdata}</b><br>",
+        "Ano: %{x}<br>",
+        "Quantidade: %{y}<extra></extra>"
+      ),
+
+    customdata = ~unidade
+  ) |>
+
+  layout(
+
+    title = list(
+      text = "<b> </b>",
+      x = 0.5
+    ),
+
+    template = "plotly_white",
+
+    hovermode = "x unified",
+
+    xaxis = list(
+      title = "",
+      tickmode = "linear"
+    ),
+
+    # não mostrar k para 1000
+    yaxis = list(
+      title = " ",
+      tickformat = ",d",
+      separatethousands = TRUE
+    ),
+
+    legend = list(
+      orientation = "h",
+      x = 0,
+      y = -0.25,
+      title = list(text = "")
+    )
+  )
+
+# ------------------------------------------------------------------
+# 5. Iniciar sem mostrar todas as variáveis
+# ------------------------------------------------------------------
+
+# Faz todas as séries iniciarem ocultas
+fig_unidade_ingressante <- plotly_build(fig_unidade_ingressante)
+
+for(i in seq_along(fig_unidade_ingressante$x$data)) {
+  fig_unidade_ingressante$x$data[[i]]$visible <- "legendonly"
+}
+
+
+# colocar fonte
+
+fig_unidade_ingressante <- fig_unidade_ingressante |>
+  layout(
+    annotations = list(
+      list(
+        text = "Fonte: SAG EA00122 em 09 de Julho de 2026",
+        x = 1, # 0.33
+        y = -0.46,
+        xref = "paper",
+        yref = "paper",
+        xanchor = "right",
+        yanchor = "top",
+        showarrow = FALSE,
+        font = list(size = 11, color = "gray40")
+      )
+    ),
+    margin = list(b = 80)  # aumenta a margem inferior
+  )
+
+fig_unidade_ingressante
+
+filtro_unidade_ingressante
+
+
+```
+
+### por curso
+
+```{r}
+
+# ------------------------------------------------------------------
+# 1. Agregar por ano, curso e modalidade
+# ------------------------------------------------------------------
+
+ano_curso_ingressante <- base_ingressante_long |>
+  group_by(ano, curso, modalidade) |>
+  summarise(
+    quantidade = sum(quantidade, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(curso, modalidade, ano)
+
+# Alterar nomes das legendas
+
+ano_curso_ingressante <- ano_curso_ingressante |>
+  mutate(
+    modalidade = recode(
+      modalidade,
+      "cota_negro" = "Racial",
+      "cota_rede_pública" = "Rede pública",
+      "cota_deficiente" = "PCD",
+      "cota_filho" = "Filho",
+      "cota_indio" = "Indígena",
+      "cota_deficiente_ou_indigena" = "PCD ou Indígena",
+      "cota_hipossuficencia" = "Hipossuficiência",
+      "cota_outras" = "Outras",
+      "não_cota" = "Ampla"
+    )
+  )
+
+# ------------------------------------------------------------------
+# 2. Dados compartilhados
+# ------------------------------------------------------------------
+
+shared_curso_ingressante <- SharedData$new(
+  ano_curso_ingressante,
+  group = "curso_ingressante"
+)
+
+# ------------------------------------------------------------------
+# 3. Filtros
+# ------------------------------------------------------------------
+
+filtro_curso_ingressante <-
+  filter_select(
+    id = "curso",
+    label = "Curso",
+    sharedData = shared_curso_ingressante,
+    group = ~curso,
+    multiple = FALSE
+  )
+
+```
+
+```{r}
+# ------------------------------------------------------------------
+# 4. Gráfico
+# ------------------------------------------------------------------
+
+fig_curso_ingressante <-
+  plot_ly(
+    shared_curso_ingressante,
+    x = ~ano,
+    y = ~quantidade,
+    color = ~modalidade,
+    colors = "Dark2",
+
+    type = "scatter",
+    mode = "lines+markers",
+
+    hovertemplate =
+      paste(
+        "<b>%{customdata}</b><br>",
+        "Ano: %{x}<br>",
+        "Quantidade: %{y}<extra></extra>"
+      ),
+
+    customdata = ~curso
+  ) |>
+
+  layout(
+
+    title = list(
+      text = "<b> </b>",
+      x = 0.5
+    ),
+
+    template = "plotly_white",
+
+    hovermode = "x unified",
+
+    xaxis = list(
+      title = "",
+      tickmode = "linear"
+    ),
+
+    # não mostrar k para 1000
+    yaxis = list(
+      title = " ",
+      tickformat = ",d",
+      separatethousands = TRUE
+    ),
+
+    legend = list(
+      orientation = "h",
+      x = 0,
+      y = -0.25,
+      title = list(text = "")
+    )
+  )
+
+# ------------------------------------------------------------------
+# 5. Iniciar sem mostrar todas as variáveis
+# ------------------------------------------------------------------
+
+# Faz todas as séries iniciarem ocultas
+fig_curso_ingressante <- plotly_build(fig_curso_ingressante)
+
+for(i in seq_along(fig_curso_ingressante$x$data)) {
+  fig_curso_ingressante$x$data[[i]]$visible <- "legendonly"
+}
+
+
+# colocar fonte
+
+fig_curso_ingressante <- fig_curso_ingressante |>
+  layout(
+    annotations = list(
+      list(
+        text = "Fonte: SAG EA00122 em 09 de Julho de 2026",
+        x = 1, # 0.33
+        y = -0.46,
+        xref = "paper",
+        yref = "paper",
+        xanchor = "right",
+        yanchor = "top",
+        showarrow = FALSE,
+        font = list(size = 11, color = "gray40")
+      )
+    ),
+    margin = list(b = 80)  # aumenta a margem inferior
+  )
+
+fig_curso_ingressante
+
+filtro_curso_ingressante
+
+```

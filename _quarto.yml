@@ -1,5 +1,6 @@
 project:
   type: website
+  output-dir: docs
 
 website:
   title: "cotas-uerj"
@@ -14,7 +15,6 @@ website:
       - inte.qmd
       - cr.qmd
       - geo.qmd
-      
 
 format:
   html:
@@ -23,4 +23,3 @@ format:
     toc: true
 
 editor: visual
-

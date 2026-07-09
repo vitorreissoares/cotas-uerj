@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Ingresso",
+    "section": "",
+    "text": "por centro setorial\n\n\n\n\n\n\n\nCentro Setorial\n\n\n\n\n\n\n\n\n\npor unidade\n\n\n\n\n\n\n\nUnidade Acadêmica\n\n\n\n\n\n\n\n\n\npor curso\n\n\n\n\n\n\n\nCurso"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Conclusão",
+    "section": "",
+    "text": "por centro setorial\n\n\n\n\n\n\n\n\n\n\nCentro Setorial\n\n\n\n\n\n\n\n\n\n\n\n\npor unidade\n\n\n\n\n\n\n\n\n\n\nUnidade Acadêmica\n\n\n\n\n\n\n\n\n\n\n\n\npor curso\n\n\n\n\n\n\n\n\n\n\nCurso"
+  },
+  {
+    "objectID": "sobre.html",
+    "href": "sobre.html",
+    "title": "Evasão",
+    "section": "",
+    "text": "por centro setorial\n\n\n\n\n\n\n\n\n\n\nCentro Setorial\n\n\n\n\n\n\n\n\n\n\n\n\npor unidade\n\n\n\n\n\n\n\n\n\n\nUnidade Acadêmica\n\n\n\n\n\n\n\n\n\n\n\n\npor curso\n\n\n\n\n\n\n\n\n\n\nCurso"
+  },
+  {
+    "objectID": "evas.html",
+    "href": "evas.html",
+    "title": "Evasão",
+    "section": "",
+    "text": "por centro setorial\n\n\n\n\n\n\n\nCentro Setorial\n\n\n\n\n\n\n\n\n\npor unidade\n\n\n\n\n\n\n\nUnidade Acadêmica\n\n\n\n\n\n\n\n\n\npor curso\n\n\n\n\n\n\n\nCurso"
+  },
+  {
+    "objectID": "conc.html",
+    "href": "conc.html",
+    "title": "Conclusão",
+    "section": "",
+    "text": "por centro setorial\n\n\n\n\n\n\n\nCentro Setorial\n\n\n\n\n\n\n\n\n\npor unidade\n\n\n\n\n\n\n\nUnidade Acadêmica\n\n\n\n\n\n\n\n\n\npor curso\n\n\n\n\n\n\n\nCurso"
+  },
+  {
+    "objectID": "ipa.html",
+    "href": "ipa.html",
+    "title": "IPA",
+    "section": "",
+    "text": "library(tidyverse)\n\n\nIndicador de Participação dos cotistas da UERJ em projetos acadêmicos\n\n\n# =========================================================\n# ETAPA 1 — DADOS REAIS DA UNIVERSIDADE\n# =========================================================\n\n# número total de estudantes\ntotal_estudantes &lt;- 1000\n\n# número total de estudantes cotistas\ntotal_cotistas &lt;- 450\n\n# número total de bolsas acadêmicas\ntotal_bolsas &lt;- 100\n\n# número de cotistas entre os bolsistas\ncotistas_bolsistas &lt;- 30\n\n\n# =========================================================\n# ETAPA 2 — CÁLCULO DAS PROPORÇÕES OBSERVADAS\n# =========================================================\n\n# proporção de cotistas na universidade\nprop_cotistas_universidade &lt;- total_cotistas / total_estudantes\n\n# proporção de cotistas entre bolsistas\nprop_cotistas_bolsistas &lt;- cotistas_bolsistas / total_bolsas\n\n\n# =========================================================\n# ETAPA 3 — CÁLCULO DO IPA\n# =========================================================\n\n# IPA = participação relativa dos cotistas\n# valor esperado = 1\n\nIPA &lt;- prop_cotistas_bolsistas / prop_cotistas_universidade\n\n# interpretação:\n#\n# IPA = 1  -&gt; participação proporcional\n# IPA &lt; 1  -&gt; sub-representação\n# IPA &gt; 1  -&gt; sobre-representação\n\n\n# =========================================================\n# ETAPA 4 — CONSTRUÇÃO DA POPULAÇÃO HIPOTÉTICA\n# =========================================================\n\n# 1 = cotista\n# 0 = ampla concorrência\n\nuniversidade &lt;- c(\n  rep(1, total_cotistas),\n  rep(0, total_estudantes - total_cotistas)\n)\n\n\n# =========================================================\n# ETAPA 5 — SIMULAÇÃO MONTE CARLO\n# =========================================================\n\n# cria espaço vazio para armazenar resultados\n\nresultado &lt;- numeric(2000)\n\n# repetimos o sorteio 2000 vezes\n\nfor(i in 1:2000){\n\n  # sorteia bolsistas aleatoriamente\n  bolsistas &lt;- sample(\n    universidade,\n    total_bolsas,\n    replace = FALSE\n  )\n\n  # calcula proporção de cotistas sorteados\n  resultado[i] &lt;- mean(bolsistas)\n\n}\n\n\n# =========================================================\n# ETAPA 6 — INTERVALO DE CONFIANÇA SIMULADO\n# =========================================================\n\n# intervalo de confiança empírico de 95%\n# baseado na distribuição simulada\n\nIC &lt;- quantile(resultado, probs = c(0.025, 0.975))\n\n\n# =========================================================\n# ETAPA 7 — p-VALOR EMPÍRICO\n# =========================================================\n\n# calcula quantas simulações produziram\n# proporções iguais ou menores que a observada\n\np_valor &lt;- mean(resultado &lt;= prop_cotistas_bolsistas)\n\np_valor\n\n[1] 0.002\n\n# interpretação:\n#\n# p pequeno -&gt; resultado observado é improvável\n# sob hipótese de distribuição aleatória das bolsas\n\n\n# =========================================================\n# ETAPA 8 — VISUALIZAÇÃO\n# =========================================================\n\nggplot() +\n\n  # histograma da distribuição simulada\n  geom_histogram(\n    aes(x = resultado),\n    binwidth = 0.02,\n    fill = \"skyblue\",\n    color = \"white\"\n  ) +\n\n  # linha da proporção observada real\n  geom_vline(\n    xintercept = prop_cotistas_bolsistas,\n    linetype = \"dashed\",\n    color = \"red\",\n    linewidth = 1\n  ) +\n\n  # linhas do intervalo de confiança\n  geom_vline(\n    xintercept = IC,\n    linetype = \"dotted\",\n    color = \"black\"\n  ) +\n\n  labs(\n    title = \"Distribuição simulada da participação de cotistas\",\n    subtitle = paste(\n      \"IPA =\", round(IPA, 2),\n      \"| p-valor =\", format(round(p_valor, 6), scientific = FALSE)\n    ),\n    x = \"Proporção de cotistas entre bolsistas\",\n    y = \"Frequência\"\n  ) +\n\n  theme_minimal()"
+  },
+  {
+    "objectID": "perfil.html",
+    "href": "perfil.html",
+    "title": "Perfil",
+    "section": "",
+    "text": "O formulário de coleta de dados foi aplicado e as respostas encontram-se disponíveis.\nPróxima etapa: Desenvolver uma apresentação automatizada dos resultados."
+  },
+  {
+    "objectID": "inte.html",
+    "href": "inte.html",
+    "title": "Integralização",
+    "section": "",
+    "text": "Há sinalização do DEP de que será concedido acesso às informações do SAG relativas à integralização curricular, possibilitando o cruzamento com os dados dos estudantes cotistas e dos participantes do Proiniciar.\nPotencial de utilização: Identificar e acompanhar estudantes próximos ao prazo máximo de integralização do curso; Subsidiar ações preventivas de acompanhamento acadêmico."
+  },
+  {
+    "objectID": "cr.html",
+    "href": "cr.html",
+    "title": "CR",
+    "section": "",
+    "text": "Ainda é necessário obter acesso às informações do SAG referentes ao Coeficiente de Rendimento (CR), que permitam o cruzamento com as demais bases de dados e a construção de indicadores acadêmicos."
+  },
+  {
+    "objectID": "geo.html",
+    "href": "geo.html",
+    "title": "Georreferencimento",
+    "section": "",
+    "text": "O código de georreferenciamento foi desenvolvido, produzimos o georreferenciamento dos estudantes inscritos no Proiniciar. Para ampliar a análise será necessário obter a base de CEPs dos estudantes, informação que ainda não está disponível."
+  }
+]

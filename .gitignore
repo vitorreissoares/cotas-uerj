@@ -1,6 +1,11 @@
-.quarto/
-_site/
-.RData
+# Histórico e dados locais do R
 .Rhistory
+.RData
+.Ruserdata
 .Rproj.user/
+
+# Arquivos internos do Quarto (pode ignorar à vontade)
 /.quarto/
+/_freeze/
+
+# ATENÇÃO: NÃO coloque a pasta docs/ aqui!

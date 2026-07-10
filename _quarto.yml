@@ -10,11 +10,12 @@ website:
         text: Ingresso
       - conc.qmd
       - evas.qmd
-      - perfil.qmd
-      - ipa.qmd
-      - inte.qmd
       - cr.qmd
+      - inte.qmd
       - geo.qmd
+      - ipa.qmd
+      - perfil.qmd
+      
 
 format:
   html:

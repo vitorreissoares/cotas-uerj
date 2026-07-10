@@ -1,5 +1,183 @@
 ---
-title: "Georreferencimento"
+title: "Localização"
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
 O código de georreferenciamento foi desenvolvido, produzimos o georreferenciamento dos estudantes inscritos no Proiniciar. Para ampliar a análise será necessário obter a base de CEPs dos estudantes, informação que ainda não está disponível.
+
+```{r}
+library(ggplot2)
+library(sf)
+library(geobr)
+library(geocodebr)
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(writexl)
+
+```
+
+
+```{r}
+ceps <- read_excel("dados/ceps.xlsx") # importar dados
+
+df_ceps <- geocodebr::busca_por_cep(
+  cep = ceps$cep,
+  resultado_sf = TRUE,
+  verboso = FALSE
+)
+
+municipios_rj <- read_municipality(code_muni = "RJ", year = 2020)
+
+ggplot() +
+  geom_sf(
+  data = municipios_rj,
+  fill = "#D9E6F2",
+  color = "white",
+  linewidth = 0.2
+) +
+
+geom_sf(
+  data = df_ceps,
+  color = "#8E2430",
+  size = 1.8,
+  alpha = 0.9
+) +
+  
+  labs(
+    title = "Distribuição Geográfica dos Estudantes Inscritos",
+    subtitle = "Estado do Rio de Janeiro • Programa Proiniciar UERJ (2024-2025)"
+  ) +
+  
+  theme_void() +
+  
+  theme(
+    plot.title = element_text(
+      face = "bold",
+      size = 20,
+      hjust = 0.5
+    ),
+    
+    plot.subtitle = element_text(
+      size = 12,
+      hjust = 0.5,
+      color = "gray40"
+    ),
+    
+    plot.background = element_rect(
+      fill = "white",
+      color = NA
+    )
+  )
+```
+
+```{r}
+
+# ==========================
+# Importar CEPs
+# ==========================
+ceps <- read_excel("dados/ceps.xlsx")
+
+# ==========================
+# Geocodificar CEPs
+# ==========================
+df_ceps <- busca_por_cep(
+  cep = ceps$cep,
+  resultado_sf = TRUE,
+  verboso = FALSE
+)
+
+# ==========================
+# Município do Rio de Janeiro
+# ==========================
+rio <- read_municipality(
+  code_muni = 3304557,
+  year = 2020
+)
+
+# ==========================
+# Todos os bairros do Brasil
+# ==========================
+bairros <- read_neighborhood(
+  year = 2010
+)
+
+# ==========================
+# Filtrar apenas bairros do Rio
+# ==========================
+bairros_rio <- bairros %>%
+  filter(code_muni == 3304557)
+
+# ==========================
+# Padronizar CRS
+# ==========================
+rio <- st_transform(rio, st_crs(df_ceps))
+bairros_rio <- st_transform(bairros_rio, st_crs(df_ceps))
+
+# ==========================
+# Manter apenas pontos dentro do município
+# ==========================
+df_ceps_rio <- st_filter(
+  df_ceps,
+  rio
+)
+
+# ==========================
+# Mapa
+# ==========================
+ggplot() +
+
+  # Fundo do município
+  geom_sf(
+    data = rio,
+    fill = "#D9E6F2",
+    color = NA
+  ) +
+
+  # Limites dos bairros
+  geom_sf(
+    data = bairros_rio,
+    fill = NA,
+    color = "white",
+    linewidth = 0.15
+  ) +
+
+  # Estudantes
+  geom_sf(
+    data = df_ceps_rio,
+    color = "#8E2430",
+    size = 1.8,
+    alpha = 0.9
+  ) +
+
+  coord_sf(expand = FALSE) +
+
+  labs(
+    title = "Distribuição Geográfica dos Estudantes Inscritos",
+    subtitle = "Município do Rio de Janeiro • Programa Proiniciar UERJ (2024–2025)"
+  ) +
+
+  theme_void() +
+
+  theme(
+    plot.title = element_text(
+      face = "bold",
+      size = 20,
+      hjust = 0.5
+    ),
+
+    plot.subtitle = element_text(
+      size = 12,
+      hjust = 0.5,
+      color = "gray40"
+    ),
+
+    plot.background = element_rect(
+      fill = "white",
+      color = NA
+    )
+  )
+```

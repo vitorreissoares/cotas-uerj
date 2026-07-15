@@ -180,6 +180,111 @@ fig_ingressante
 
 ```
 
+Proporção
+
+```{r}
+# proporções
+
+base_ingressante_cota_ncota <- base_ingressante |>
+  mutate(
+    cotas = cota_negro +
+      cota_rede_pública +
+      cota_deficiente +
+      cota_filho +
+      cota_indio +
+      cota_deficiente_ou_indigena +
+      cota_hipossuficencia +
+      cota_outras
+  ) |>
+  select(
+    ano,
+    não_cota,
+    cotas
+  ) |>
+  pivot_longer(
+    cols = c(não_cota, cotas),
+    names_to = "modalidade",
+    values_to = "quantidade"
+  ) |>
+  group_by(ano, modalidade) |>
+  summarise(
+    quantidade = sum(quantidade, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  group_by(ano) |>
+  mutate(
+    proporcao = quantidade / sum(quantidade)
+  ) |>
+  ungroup()
+```
+
+```{r}
+# ------------------------------------------------------------------
+# Gráfico cotistas x não cotistas
+# ------------------------------------------------------------------
+
+fig_ingressante <- plot_ly(
+  base_ingressante_cota_ncota,
+  x = ~factor(ano),
+  y = ~proporcao,
+  color = ~modalidade,
+  colors = c("#4E79A7", "#E15759"),
+  type = "bar",
+  hovertemplate = paste(
+  "<b>%{fullData.name}</b><br>",
+  "Ano: %{x}<br>",
+  "Proporção: %{y:.1%}<extra></extra>"
+)
+) |>
+  layout(
+    title = list(
+      text = "<b> </b>",
+      x = 0.5
+    ),
+    barmode = "group",
+    template = "plotly_white",
+    hovermode = "x unified",
+    xaxis = list(
+      title = " "
+    ),
+    yaxis = list(
+      title = " ",
+      tickformat = ",.0%",
+      separatethousands = TRUE
+    ),
+    legend = list(
+      title = list(text = ""),
+      orientation = "h",
+      x = 0.3,
+      y = -0.2
+    )
+  )
+
+# colocar fonte
+
+fig_ingressante <- fig_ingressante |>
+  layout(
+    annotations = list(
+      list(
+        text = "Fonte: SAG EA00122 em 09 de Julho de 2026",
+        x = 1, # ajuste horizontal (1 = a direita 0.30)
+        y = -0.28, # ajuste vertical
+        xref = "paper",
+        yref = "paper",
+        xanchor = "right",
+        yanchor = "top",
+        showarrow = FALSE,
+        font = list(size = 11, color = "gray40")
+      )
+    ),
+    margin = list(b = 80)  # aumenta a margem inferior
+  )
+
+fig_ingressante
+```
+
+
+
 ### por centro setorial
 
 ```{r}

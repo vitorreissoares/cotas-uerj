@@ -11,7 +11,7 @@
     "href": "perfil.html",
     "title": "Perfil",
     "section": "",
-    "text": "O formulário de coleta de dados foi aplicado e as respostas encontram-se disponíveis.\nPróxima etapa: Desenvolver uma apresentação automatizada dos resultados."
+    "text": "Autodeclaração racial\n\n\n\n\n\n\n\n\nGênero\n\n\nFaixa etária\n\n\nPCD\n“pcd”, “pcd_especificacao”,\n\n\nCurso\n“curso”, “ano_ingresso”,\n\n\nBolsas e ocupação\n“bolsa_pibic”, “bolsa_pibid”, “bolsa_pibiti”, “bolsa_cetreina”, “bolsa_monitoria”, “bolsa_permanencia”, “bolsa_bavs”, “sem_bolsa”, “ocupa_estuda”, “ocupa_pesquisa”, “ocupa_representacao”, “ocupa_extensao”, “ocupa_residencia”, “ocupa_voluntariado”, “ocupa_iniciacao_docencia”, “ocupa_estagio_obrigatorio”, “emprego_formal”, “emprego_informal”, “coletivo_movimento”, “estagio_nao_obrigatorio”,\n\n\nEsporte\n“esporte”,\n\n\nCultura\n“atividade_cultural”,\n\n\nReligião\n“religiao_matriz_africana”,\n\n\nPré-Vestibular\n“pre_vestibular”, “tempo_pre_vestibular”,\n\n\nComposição familiar\n“filhos_dependentes”, “mora_com”,\n\n\nMoradia\n“cep”,\n\n\nMobilidade\n“transporte_pe_bicicleta”, “transporte_veiculo”, “transporte_carona”, “transporte_taxi_app”, “transporte_publico”, “tp_trem”, “tp_metro”, “tp_brt”, “tp_onibus”, “tp_onibus_universitario”, “usa_integracao”, “qtd_integracoes”,\n\n\nPermanência no Campus\n“tempo_semana_campus”, “turno_manha”, “turno_tarde”, “turno_noite”,\n\n\nAlimentação\n“ru_cafe”, “ru_almoco”, “ru_jantar”, “auxilio_alimentacao”, “traz_alimento”, “alimentacao_outros”,\nO formulário de coleta de dados foi aplicado e as respostas encontram-se disponíveis.\nPróxima etapa: Desenvolver uma apresentação automatizada dos resultados."
   },
   {
     "objectID": "inte.html",

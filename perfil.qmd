@@ -2,6 +2,599 @@
 title: "Perfil"
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(plotly)
+
+library(ggplot2)
+library(sf)
+library(geobr)
+library(geocodebr)
+
+
+library(crosstalk)
+library(htmltools)
+
+```
+
+```{r}
+perfil <- read.csv("dados/perfil.csv")
+```
+
+```{r}
+names(perfil) <- c(
+  "id_resposta",
+  "data_envio",
+  "ultima_pagina",
+  "idioma",
+  "semente",
+  "data_inicio",
+  "data_ultima_acao",
+  "ip",
+  "nome",
+  "matricula",
+  "raca_cor",
+  "genero",
+  "idade_faixa", 
+  "pcd",
+  "pcd_especificacao",
+  "curso",
+  "ano_ingresso",
+  "bolsa_pibic",
+  "bolsa_pibid",
+  "bolsa_pibiti",
+  "bolsa_cetreina",
+  "bolsa_monitoria",
+  "bolsa_permanencia",
+  "bolsa_bavs",
+  "sem_bolsa",
+  "ocupa_estuda",
+  "ocupa_pesquisa",
+  "ocupa_representacao",
+  "ocupa_extensao",
+  "ocupa_residencia",
+  "ocupa_voluntariado",
+  "ocupa_iniciacao_docencia",
+  "ocupa_estagio_obrigatorio",
+  "emprego_formal",
+  "emprego_informal",
+  "coletivo_movimento",
+  "estagio_nao_obrigatorio",
+  "esporte",
+  "atividade_cultural",
+  "religiao_matriz_africana",
+  "pre_vestibular",
+  "tempo_pre_vestibular",
+  "filhos_dependentes",
+  "mora_com",
+  "cep",
+  "transporte_pe_bicicleta",
+  "transporte_veiculo",
+  "transporte_carona",
+  "transporte_taxi_app",
+  "transporte_publico",
+  "tp_trem",
+  "tp_metro",
+  "tp_brt",
+  "tp_onibus",
+  "tp_onibus_universitario",
+  "usa_integracao",
+  "qtd_integracoes",
+  "tempo_semana_campus",
+  "turno_manha",
+  "turno_tarde",
+  "turno_noite",
+  "ru_cafe",
+  "ru_almoco",
+  "ru_jantar",
+  "auxilio_alimentacao",
+  "traz_alimento",
+  "alimentacao_outros",
+  "formulario_enviado"
+)
+```
+
+```{r}
+perfil <- perfil %>%
+  mutate(
+    matricula = str_trim(matricula),             # remove espaços no início e fim
+    matricula = str_remove_all(matricula, "\\."),# remove pontos
+    matricula = str_remove_all(matricula, " "),  # remove espaços internos
+    matricula = str_remove_all(matricula, "[^0-9]") # mantém apenas números
+  ) %>%
+  filter(nchar(matricula) > 0, nchar(matricula) == 12) %>%
+  distinct(matricula, .keep_all = TRUE)
+```
+
+```{r}
+perfil24 <- perfil |>
+  filter(str_starts(data_envio, "2024"))
+
+perfil25 <- perfil %>%
+  filter(str_starts(data_envio, "2025"))
+
+perfil26 <- perfil %>%
+  filter(str_starts(data_envio, "2026"))
+```
+
+### Autodeclaração racial
+
+```{r}
+# Preparar os dados
+raca_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  count(ano, raca_cor) %>%
+  group_by(ano) %>%
+  arrange(desc(n), .by_group = TRUE) %>%
+  mutate(
+    prop = n / sum(n),
+    perc = paste0(round(prop * 100, 1), "%"),
+    ordem = row_number()
+  ) %>%
+  ungroup()
+
+# organizar a ordem
+
+raca_prop$raca_cor <- factor(
+  raca_prop$raca_cor,
+  levels = c(
+    "Negro",
+    "Branco",
+    "Outro",
+    "Amarelo (Asiático)",
+    "Indígena"
+  )
+)
+
+# Criar o gráfico
+g <- ggplot(
+  raca_prop,
+  aes(
+    x = ano,
+    y = prop,
+    fill = raca_cor,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Raça/Cor: ", raca_cor,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc
+    )
+  )
+) +
+  geom_col(width = 0.7, aes(order = -ordem)) +
+
+geom_text(
+  aes(label = perc, order = -ordem),
+  position = position_stack(vjust = 0.5),
+  color = "white",
+  size = 4
+) +
+  scale_y_continuous(
+    labels = function(x) paste0(x * 100, "%"),
+    limits = c(0, 1)
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = " ",
+    subtitle = " ",
+    x = " ",
+    y = " ",
+    fill = " "
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    legend.position = "bottom"
+  )
+
+# Tornar interativo
+ggplotly(g, tooltip = "text")
+```
+
+```{r}
+View(perfil)
+```
+
+
+### Gênero
+
+```{r}
+# verifica quais respostas deram no questionário
+sort(unique(perfil$genero))
+```
+
+```{r}
+# divide nas três categorias
+perfil <- perfil %>%
+  mutate(
+    genero_limpo = genero |>
+      str_to_lower() |>
+      str_trim() |>
+      stringi::stri_trans_general("Latin-ASCII"),
+
+    genero_cat = case_when(
+
+      # Não-binário
+      str_detect(genero_limpo,
+                 "nao.?bin|nb$|agenero|queer|fluide|genero fluido|não -binárie") ~ "Não-binário",
+
+      # Transgênero
+      str_detect(genero_limpo,
+                 "trans|transmasculino|transgenero") ~ "Transgênero",
+
+      # Cisgênero
+      str_detect(genero_limpo,
+                 "cis|homem|mulher|femin|mascul|sis|six|f|femenina|maculino|mascolino") ~ "Cisgênero",
+
+      # Demais respostas
+      TRUE ~ NA_character_
+    )
+  )
+```
+
+```{r}
+# verificar classificação
+perfil %>%
+  distinct(genero, genero_cat) %>%
+  arrange(genero_cat, genero)
+```
+
+```{r}
+# criar grafico de genero
+
+# Preparar os dados
+genero_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  filter(!is.na(genero_cat)) %>%   # remove os casos não classificados
+  count(ano, genero_cat) %>%
+  group_by(ano) %>%
+  arrange(desc(n), .by_group = TRUE) %>%
+  mutate(
+    prop = n / sum(n),
+    perc = paste0(round(prop * 100, 1), "%"),
+    ordem = row_number()
+  ) %>%
+  ungroup()
+
+# Definir a ordem das categorias
+genero_prop$genero_cat <- factor(
+  genero_prop$genero_cat,
+  levels = c(
+    "Cisgênero",
+    "Não-binário", 
+    "Transgênero"
+  )
+)
+
+# Criar o gráfico
+g <- ggplot(
+  genero_prop,
+  aes(
+    x = ano,
+    y = prop,
+    fill = genero_cat,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Gênero: ", genero_cat,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc
+    )
+  )
+) +
+  geom_col(width = 0.7, aes(order = -ordem)) +
+
+  geom_text(
+    aes(label = perc, order = -ordem),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    size = 4
+  ) +
+
+  scale_y_continuous(
+    labels = function(x) paste0(x * 100, "%"),
+    limits = c(0, 1)
+  ) +
+
+  scale_fill_brewer(palette = "Set2") +
+
+  labs(
+    title = " ",
+    subtitle = " ",
+    x = " ",
+    y = " ",
+    fill = " "
+  ) +
+
+  theme_minimal(base_size = 13) +
+
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    legend.position = "bottom"
+  )
+
+# Tornar interativo
+ggplotly(g, tooltip = "text")
+
+```
+
+### Faixa etária
+
+```{r}
+# verifica quais respostas deram no questionário
+sort(unique(perfil$idade_faixa))
+```
+```{r}
+# Preparar os dados
+idade_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  filter(!is.na(idade_faixa)) %>%
+  count(ano, idade_faixa) %>%
+  group_by(ano) %>%
+  arrange(desc(n), .by_group = TRUE) %>%
+  mutate(
+    prop = n / sum(n),
+    perc = paste0(round(prop * 100, 1), "%"),
+    ordem = row_number()
+  ) %>%
+  ungroup()
+```
+
+```{r}
+idade_prop$idade_faixa <- factor(
+  idade_prop$idade_faixa,
+  levels = c(
+    "Até 27 anos",
+    "Entre 28 e 43 anos",
+    "Entre 44 e 59 anos",
+    "A partir de 60 anos"
+  )
+)
+```
+
+```{r}
+# Criar o gráfico
+g <- ggplot(
+  idade_prop,
+  aes(
+    x = ano,
+    y = prop,
+    fill = idade_faixa,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Faixa etária: ", idade_faixa,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc
+    )
+  )
+) +
+  geom_col(width = 0.7, aes(order = -ordem)) +
+
+  geom_text(
+    aes(label = perc, order = -ordem),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    size = 4
+  ) +
+
+  scale_y_continuous(
+    labels = function(x) paste0(x * 100, "%"),
+    limits = c(0, 1)
+  ) +
+
+  scale_fill_brewer(palette = "Set2") +
+
+  labs(
+    title = " ",
+    subtitle = " ",
+    x = " ",
+    y = " ",
+    fill = "Faixa etária"
+  ) +
+
+  theme_minimal(base_size = 13) +
+
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    legend.position = "bottom"
+  )
+
+# Tornar interativo
+ggplotly(g, tooltip = "text")
+```
+
+### PCD
+
+"pcd", "pcd_especificacao",
+
+### Curso
+
+"curso", "ano_ingresso",
+
+### Bolsas 
+
+"bolsa_pibic", "bolsa_pibid", "bolsa_pibiti", "bolsa_cetreina", "bolsa_monitoria", "bolsa_permanencia", "bolsa_bavs", "sem_bolsa", 
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+
+# Variáveis de bolsas ### acertar a ordem decrescente
+vars_bolsas <- c(
+  "bolsa_pibic",
+  "bolsa_pibid",
+  "bolsa_pibiti",
+  "bolsa_cetreina",
+  "bolsa_monitoria",
+  "bolsa_bavs", # bolsa_bavs
+  "sem_bolsa", # sem_bolsa
+  "bolsa_permanencia" # bolsa_permanencia
+)
+
+# Preparar os dados
+bolsas_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  select(ano, all_of(vars_bolsas)) %>%
+  pivot_longer(
+    cols = -ano,
+    names_to = "bolsa",
+    values_to = "resposta"
+  ) %>%
+  filter(resposta == "Sim") %>%      # <- alterar se sua base usa 1, TRUE, etc.
+  count(ano, bolsa) %>%
+  left_join(
+    perfil %>%
+      mutate(ano = substr(data_envio, 1, 4)) %>%
+      filter(ano %in% c("2024", "2025", "2026")) %>%
+      count(ano, name = "total"),
+    by = "ano"
+  ) %>%
+  mutate(
+    prop = n / total,
+    perc = round(prop * 100, 1)
+  )
+```
+
+```{r}
+bolsas_prop$bolsa <- factor(
+  bolsas_prop$bolsa,
+  levels = vars_bolsas,
+  labels = c(
+    "PIBIC",
+    "PIBID",
+    "PIBITI",
+    "CETREINA",
+    "Monitoria",
+    "BAVS", 
+    "Sem bolsa",
+    "Permanência" 
+  )
+)
+```
+
+```{r}
+g <- ggplot(
+  bolsas_prop,
+  aes(
+    x = perc,
+    y = bolsa,
+    fill = ano,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Bolsa: ", bolsa,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc, "%"
+    )
+  )
+) +
+
+geom_col(
+  position = position_dodge(width = .75),
+  width = .65
+) +
+
+geom_text(
+  aes(
+    x = perc + 5,
+    label = paste0(perc, "%")
+  ),
+  position = position_dodge(width = .75), # mudei
+  hjust = 0,
+  size = 2.5, # tamanho da fonte da porcentagem
+  color = "black"
+) +
+
+scale_x_continuous(
+  limits = c(0, max(bolsas_prop$perc) + 12),
+  labels = function(x) paste0(x, "%"),
+  expand = expansion(mult = c(0, .02))
+) +
+
+scale_fill_brewer(
+  palette = "Set2",
+  name = "Ano"
+) +
+
+labs(
+  x = "",
+  y = "",
+  title = "",
+  subtitle = ""
+) +
+
+theme_minimal(base_size = 13) +
+
+theme(
+  legend.position = "bottom",
+  panel.grid.major.y = element_blank()
+)
+
+ggplotly(g, tooltip = "text")
+```
+
+
+### Atividades Acadêmicas
+
+"ocupa_estuda", "ocupa_pesquisa", "ocupa_representacao", "ocupa_extensao", "ocupa_residencia", "ocupa_voluntariado", "ocupa_iniciacao_docencia", "ocupa_estagio_obrigatorio", 
+
+
+### Trabalho
+
+"emprego_formal", "emprego_informal", "estagio_nao_obrigatorio",
+
+### Participação social
+
+"coletivo_movimento", 
+
+### Esporte
+
+"esporte",
+
+### Cultura
+
+"atividade_cultural",
+
+### Religião
+
+"religiao_matriz_africana",
+
+### Pré-Vestibular
+
+"pre_vestibular", "tempo_pre_vestibular",
+
+### Composição familiar
+
+"filhos_dependentes", "mora_com",
+
+### Moradia
+
+"cep",
+
+### Mobilidade
+
+"transporte_pe_bicicleta", "transporte_veiculo", "transporte_carona", "transporte_taxi_app", "transporte_publico", "tp_trem", "tp_metro", "tp_brt", "tp_onibus", "tp_onibus_universitario", "usa_integracao", "qtd_integracoes",
+
+### Permanência no Campus
+
+"tempo_semana_campus", "turno_manha", "turno_tarde", "turno_noite",
+
+### Alimentação
+
+"ru_cafe", "ru_almoco", "ru_jantar", "auxilio_alimentacao", "traz_alimento", "alimentacao_outros",
+
 O formulário de coleta de dados foi aplicado e as respostas encontram-se disponíveis.
 
 Próxima etapa: Desenvolver uma apresentação automatizada dos resultados.

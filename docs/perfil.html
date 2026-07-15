@@ -59,6 +59,15 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<link href="site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.12.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="site_libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="site_libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
 
 
 <link rel="stylesheet" href="styles.css">
@@ -94,24 +103,24 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Evasão</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./perfil.html" rel="" target="" aria-current="page">
- <span class="menu-text">Perfil</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./ipa.html" rel="" target="">
- <span class="menu-text">IPA</span></a>
+    <a class="nav-link" href="./cr.html" rel="" target="">
+ <span class="menu-text">CR</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./inte.html" rel="" target="">
  <span class="menu-text">Integralização</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./cr.html" rel="" target="">
- <span class="menu-text">CR</span></a>
+    <a class="nav-link" href="./geo.html" rel="" target="">
+ <span class="menu-text">Localização</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./geo.html" rel="" target="">
- <span class="menu-text">Georreferencimento</span></a>
+    <a class="nav-link" href="./ipa.html" rel="" target="">
+ <span class="menu-text">IPA</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./perfil.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Perfil</span></a>
   </li>  
 </ul>
             <div class="quarto-navbar-tools ms-auto">
@@ -125,7 +134,27 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#autodeclaração-racial" id="toc-autodeclaração-racial" class="nav-link active" data-scroll-target="#autodeclaração-racial">Autodeclaração racial</a></li>
+  <li><a href="#gênero" id="toc-gênero" class="nav-link" data-scroll-target="#gênero">Gênero</a></li>
+  <li><a href="#faixa-etária" id="toc-faixa-etária" class="nav-link" data-scroll-target="#faixa-etária">Faixa etária</a></li>
+  <li><a href="#pcd" id="toc-pcd" class="nav-link" data-scroll-target="#pcd">PCD</a></li>
+  <li><a href="#curso" id="toc-curso" class="nav-link" data-scroll-target="#curso">Curso</a></li>
+  <li><a href="#bolsas-e-ocupação" id="toc-bolsas-e-ocupação" class="nav-link" data-scroll-target="#bolsas-e-ocupação">Bolsas e ocupação</a></li>
+  <li><a href="#esporte" id="toc-esporte" class="nav-link" data-scroll-target="#esporte">Esporte</a></li>
+  <li><a href="#cultura" id="toc-cultura" class="nav-link" data-scroll-target="#cultura">Cultura</a></li>
+  <li><a href="#religião" id="toc-religião" class="nav-link" data-scroll-target="#religião">Religião</a></li>
+  <li><a href="#pré-vestibular" id="toc-pré-vestibular" class="nav-link" data-scroll-target="#pré-vestibular">Pré-Vestibular</a></li>
+  <li><a href="#composição-familiar" id="toc-composição-familiar" class="nav-link" data-scroll-target="#composição-familiar">Composição familiar</a></li>
+  <li><a href="#moradia" id="toc-moradia" class="nav-link" data-scroll-target="#moradia">Moradia</a></li>
+  <li><a href="#mobilidade" id="toc-mobilidade" class="nav-link" data-scroll-target="#mobilidade">Mobilidade</a></li>
+  <li><a href="#permanência-no-campus" id="toc-permanência-no-campus" class="nav-link" data-scroll-target="#permanência-no-campus">Permanência no Campus</a></li>
+  <li><a href="#alimentação" id="toc-alimentação" class="nav-link" data-scroll-target="#alimentação">Alimentação</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -147,10 +176,73 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<section id="autodeclaração-racial" class="level3">
+<h3 class="anchored" data-anchor-id="autodeclaração-racial">Autodeclaração racial</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-0bb9e35ebb112156e383" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-0bb9e35ebb112156e383">{"x":{"data":[{"orientation":"v","width":[0.70000000000000007,0.70000000000000018,0.70000000000000018],"base":[0.44255319148936167,0.5,0.5],"x":[1,2,3],"y":[0.55744680851063833,0.5,0.5],"text":["Ano: 2024<br>Raça/Cor: Negro<br>Quantidade: 262<br>Proporção: 55.7%","Ano: 2025<br>Raça/Cor: Negro<br>Quantidade: 152<br>Proporção: 50%","Ano: 2026<br>Raça/Cor: Negro<br>Quantidade: 21<br>Proporção: 50%"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(102,194,165,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Negro","legendgroup":"Negro","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.70000000000000007,0.70000000000000018,0.70000000000000018],"base":[0.1446808510638298,0.17105263157894735,0.19047619047619047],"x":[1,2,3],"y":[0.2978723404255319,0.32894736842105265,0.30952380952380953],"text":["Ano: 2024<br>Raça/Cor: Branco<br>Quantidade: 140<br>Proporção: 29.8%","Ano: 2025<br>Raça/Cor: Branco<br>Quantidade: 100<br>Proporção: 32.9%","Ano: 2026<br>Raça/Cor: Branco<br>Quantidade: 13<br>Proporção: 31%"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(252,141,98,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Branco","legendgroup":"Branco","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.70000000000000007,0.70000000000000018,0.70000000000000018],"base":[0.0085106382978723406,0.013157894736842105,0.023809523809523808],"x":[1,2,3],"y":[0.13617021276595745,0.15789473684210525,0.16666666666666666],"text":["Ano: 2024<br>Raça/Cor: Outro<br>Quantidade: 64<br>Proporção: 13.6%","Ano: 2025<br>Raça/Cor: Outro<br>Quantidade: 48<br>Proporção: 15.8%","Ano: 2026<br>Raça/Cor: Outro<br>Quantidade: 7<br>Proporção: 16.7%"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(141,160,203,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Outro","legendgroup":"Outro","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.70000000000000007,"base":0.0021276595744680851,"x":[1],"y":[0.0063829787234042559],"text":"Ano: 2024<br>Raça/Cor: Amarelo (Asiático)<br>Quantidade: 3<br>Proporção: 0.6%","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(231,138,195,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Amarelo (Asiático)","legendgroup":"Amarelo (Asiático)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.70000000000000007,0.70000000000000018,0.70000000000000018],"base":[0,0,0],"x":[1,2,3],"y":[0.0021276595744680851,0.013157894736842105,0.023809523809523808],"text":["Ano: 2024<br>Raça/Cor: Indígena<br>Quantidade: 1<br>Proporção: 0.2%","Ano: 2025<br>Raça/Cor: Indígena<br>Quantidade: 4<br>Proporção: 1.3%","Ano: 2026<br>Raça/Cor: Indígena<br>Quantidade: 1<br>Proporção: 2.4%"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(166,216,84,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Indígena","legendgroup":"Indígena","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3],"y":[0.72127659574468084,0.75,0.75],"text":["55.7%","50%","50%"],"hovertext":["Ano: 2024<br>Raça/Cor: Negro<br>Quantidade: 262<br>Proporção: 55.7%","Ano: 2025<br>Raça/Cor: Negro<br>Quantidade: 152<br>Proporção: 50%","Ano: 2026<br>Raça/Cor: Negro<br>Quantidade: 21<br>Proporção: 50%"],"textfont":{"size":15.118110236220474,"color":"rgba(255,255,255,1)"},"type":"scatter","mode":"text","hoveron":"points","name":"Negro","legendgroup":"Negro","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3],"y":[0.29361702127659572,0.33552631578947367,0.34523809523809523],"text":["29.8%","32.9%","31%"],"hovertext":["Ano: 2024<br>Raça/Cor: Branco<br>Quantidade: 140<br>Proporção: 29.8%","Ano: 2025<br>Raça/Cor: Branco<br>Quantidade: 100<br>Proporção: 32.9%","Ano: 2026<br>Raça/Cor: Branco<br>Quantidade: 13<br>Proporção: 31%"],"textfont":{"size":15.118110236220474,"color":"rgba(255,255,255,1)"},"type":"scatter","mode":"text","hoveron":"points","name":"Branco","legendgroup":"Branco","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3],"y":[0.076595744680851077,0.092105263157894718,0.10714285714285714],"text":["13.6%","15.8%","16.7%"],"hovertext":["Ano: 2024<br>Raça/Cor: Outro<br>Quantidade: 64<br>Proporção: 13.6%","Ano: 2025<br>Raça/Cor: Outro<br>Quantidade: 48<br>Proporção: 15.8%","Ano: 2026<br>Raça/Cor: Outro<br>Quantidade: 7<br>Proporção: 16.7%"],"textfont":{"size":15.118110236220474,"color":"rgba(255,255,255,1)"},"type":"scatter","mode":"text","hoveron":"points","name":"Outro","legendgroup":"Outro","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1],"y":[0.0053191489361702126],"text":"0.6%","hovertext":"Ano: 2024<br>Raça/Cor: Amarelo (Asiático)<br>Quantidade: 3<br>Proporção: 0.6%","textfont":{"size":15.118110236220474,"color":"rgba(255,255,255,1)"},"type":"scatter","mode":"text","hoveron":"points","name":"Amarelo (Asiático)","legendgroup":"Amarelo (Asiático)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3],"y":[0.0010638297872340426,0.0065789473684210523,0.011904761904761904],"text":["0.2%","1.3%","2.4%"],"hovertext":["Ano: 2024<br>Raça/Cor: Indígena<br>Quantidade: 1<br>Proporção: 0.2%","Ano: 2025<br>Raça/Cor: Indígena<br>Quantidade: 4<br>Proporção: 1.3%","Ano: 2026<br>Raça/Cor: Indígena<br>Quantidade: 1<br>Proporção: 2.4%"],"textfont":{"size":15.118110236220474,"color":"rgba(255,255,255,1)"},"type":"scatter","mode":"text","hoveron":"points","name":"Indígena","legendgroup":"Indígena","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":45.356579493565803,"r":8.6342880863428828,"b":44.034869240348698,"l":57.84973017849731},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":17.268576172685762},"title":{"text":"<b>   <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":20.722291407222919},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,3.6000000000000001],"tickmode":"array","ticktext":["2024","2025","2026"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["2024","2025","2026"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":4.3171440431714405,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":13.814860938148611},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.78493528057662576,"zeroline":false,"anchor":"y","title":{"text":" ","font":{"color":"rgba(0,0,0,1)","family":"","size":17.268576172685762}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.050000000000000003,1.05],"tickmode":"array","ticktext":["0%","25%","50%","75%","100%"],"tickvals":[0,0.25,0.5,0.75,1],"categoryorder":"array","categoryarray":["0%","25%","50%","75%","100%"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":4.3171440431714414,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":13.814860938148611},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.78493528057662576,"zeroline":false,"anchor":"x","title":{"text":" ","font":{"color":"rgba(0,0,0,1)","family":"","size":17.268576172685762}},"hoverformat":".2f"},"shapes":[],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":13.814860938148611},"orientation":"h","x":0.5,"y":-0.14999999999999999,"xanchor":"center","yanchor":"top","title":{"text":" ","font":{"color":"rgba(0,0,0,1)","family":"","size":17.268576172685762}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"c281b2a7df1":{"x":{},"y":{},"fill":{},"text":{},"order":{},"type":"bar"},"c28df82c2":{"x":{},"y":{},"fill":{},"text":{},"label":{},"order":{}}},"cur_data":"c281b2a7df1","visdat":{"c281b2a7df1":["function (y) ","x"],"c28df82c2":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="gênero" class="level3">
+<h3 class="anchored" data-anchor-id="gênero">Gênero</h3>
+</section>
+<section id="faixa-etária" class="level3">
+<h3 class="anchored" data-anchor-id="faixa-etária">Faixa etária</h3>
+</section>
+<section id="pcd" class="level3">
+<h3 class="anchored" data-anchor-id="pcd">PCD</h3>
+<p>“pcd”, “pcd_especificacao”,</p>
+</section>
+<section id="curso" class="level3">
+<h3 class="anchored" data-anchor-id="curso">Curso</h3>
+<p>“curso”, “ano_ingresso”,</p>
+</section>
+<section id="bolsas-e-ocupação" class="level3">
+<h3 class="anchored" data-anchor-id="bolsas-e-ocupação">Bolsas e ocupação</h3>
+<p>“bolsa_pibic”, “bolsa_pibid”, “bolsa_pibiti”, “bolsa_cetreina”, “bolsa_monitoria”, “bolsa_permanencia”, “bolsa_bavs”, “sem_bolsa”, “ocupa_estuda”, “ocupa_pesquisa”, “ocupa_representacao”, “ocupa_extensao”, “ocupa_residencia”, “ocupa_voluntariado”, “ocupa_iniciacao_docencia”, “ocupa_estagio_obrigatorio”, “emprego_formal”, “emprego_informal”, “coletivo_movimento”, “estagio_nao_obrigatorio”,</p>
+</section>
+<section id="esporte" class="level3">
+<h3 class="anchored" data-anchor-id="esporte">Esporte</h3>
+<p>“esporte”,</p>
+</section>
+<section id="cultura" class="level3">
+<h3 class="anchored" data-anchor-id="cultura">Cultura</h3>
+<p>“atividade_cultural”,</p>
+</section>
+<section id="religião" class="level3">
+<h3 class="anchored" data-anchor-id="religião">Religião</h3>
+<p>“religiao_matriz_africana”,</p>
+</section>
+<section id="pré-vestibular" class="level3">
+<h3 class="anchored" data-anchor-id="pré-vestibular">Pré-Vestibular</h3>
+<p>“pre_vestibular”, “tempo_pre_vestibular”,</p>
+</section>
+<section id="composição-familiar" class="level3">
+<h3 class="anchored" data-anchor-id="composição-familiar">Composição familiar</h3>
+<p>“filhos_dependentes”, “mora_com”,</p>
+</section>
+<section id="moradia" class="level3">
+<h3 class="anchored" data-anchor-id="moradia">Moradia</h3>
+<p>“cep”,</p>
+</section>
+<section id="mobilidade" class="level3">
+<h3 class="anchored" data-anchor-id="mobilidade">Mobilidade</h3>
+<p>“transporte_pe_bicicleta”, “transporte_veiculo”, “transporte_carona”, “transporte_taxi_app”, “transporte_publico”, “tp_trem”, “tp_metro”, “tp_brt”, “tp_onibus”, “tp_onibus_universitario”, “usa_integracao”, “qtd_integracoes”,</p>
+</section>
+<section id="permanência-no-campus" class="level3">
+<h3 class="anchored" data-anchor-id="permanência-no-campus">Permanência no Campus</h3>
+<p>“tempo_semana_campus”, “turno_manha”, “turno_tarde”, “turno_noite”,</p>
+</section>
+<section id="alimentação" class="level3">
+<h3 class="anchored" data-anchor-id="alimentação">Alimentação</h3>
+<p>“ru_cafe”, “ru_almoco”, “ru_jantar”, “auxilio_alimentacao”, “traz_alimento”, “alimentacao_outros”,</p>
 <p>O formulário de coleta de dados foi aplicado e as respostas encontram-se disponíveis.</p>
 <p>Próxima etapa: Desenvolver uma apresentação automatizada dos resultados.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

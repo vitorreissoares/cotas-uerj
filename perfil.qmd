@@ -236,9 +236,9 @@ perfil <- perfil %>%
 
 ```{r}
 # verificar classificação
-perfil %>%
-  distinct(genero, genero_cat) %>%
-  arrange(genero_cat, genero)
+#perfil %>%
+  #distinct(genero, genero_cat) %>%
+  #arrange(genero_cat, genero)
 ```
 
 ```{r}

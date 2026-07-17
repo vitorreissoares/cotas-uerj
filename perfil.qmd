@@ -198,16 +198,11 @@ geom_text(
 ggplotly(g, tooltip = "text")
 ```
 
-```{r}
-View(perfil)
-```
-
-
 ### Gênero
 
 ```{r}
 # verifica quais respostas deram no questionário
-sort(unique(perfil$genero))
+# sort(unique(perfil$genero))
 ```
 
 ```{r}
@@ -330,8 +325,9 @@ ggplotly(g, tooltip = "text")
 
 ```{r}
 # verifica quais respostas deram no questionário
-sort(unique(perfil$idade_faixa))
+# sort(unique(perfil$idade_faixa))
 ```
+
 ```{r}
 # Preparar os dados
 idade_prop <- perfil %>%
@@ -423,7 +419,6 @@ ggplotly(g, tooltip = "text")
 
 ### Bolsas 
 
-"bolsa_pibic", "bolsa_pibid", "bolsa_pibiti", "bolsa_cetreina", "bolsa_monitoria", "bolsa_permanencia", "bolsa_bavs", "sem_bolsa", 
 
 ```{r}
 library(dplyr)
@@ -548,28 +543,600 @@ ggplotly(g, tooltip = "text")
 
 ### Atividades Acadêmicas
 
-"ocupa_estuda", "ocupa_pesquisa", "ocupa_representacao", "ocupa_extensao", "ocupa_residencia", "ocupa_voluntariado", "ocupa_iniciacao_docencia", "ocupa_estagio_obrigatorio", 
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+
+# Variáveis de atividades acadêmicas # organizar a ordem e os rótulos
+vars_atividades <- c(
+  "ocupa_estuda",
+  "ocupa_pesquisa",
+  "ocupa_representacao",
+  "ocupa_extensao",
+  "ocupa_residencia",
+  "ocupa_voluntariado",
+  "ocupa_iniciacao_docencia",
+  "ocupa_estagio_obrigatorio"
+)
+
+# Preparar os dados
+atividades_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  select(ano, all_of(vars_atividades)) %>%
+  pivot_longer(
+    cols = -ano,
+    names_to = "atividade",
+    values_to = "resposta"
+  ) %>%
+  filter(resposta == "Sim") %>%
+  count(ano, atividade) %>%
+  left_join(
+    perfil %>%
+      mutate(ano = substr(data_envio, 1, 4)) %>%
+      filter(ano %in% c("2024", "2025", "2026")) %>%
+      count(ano, name = "total"),
+    by = "ano"
+  ) %>%
+  mutate(
+    prop = n / total,
+    perc = round(prop * 100, 1)
+  )
+
+# Rótulos das atividades
+atividades_prop$atividade <- factor(
+  atividades_prop$atividade,
+  levels = vars_atividades,
+  labels = c(
+    "Estuda",
+    "Pesquisa",
+    "Representação estudantil",
+    "Extensão",
+    "Residência",
+    "Voluntariado",
+    "Iniciação à Docência",
+    "Estágio Obrigatório"
+  )
+)
+
+# Gráfico
+g <- ggplot(
+  atividades_prop,
+  aes(
+    x = perc,
+    y = atividade,
+    fill = ano,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Atividade: ", atividade,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc, "%"
+    )
+  )
+) +
+
+  geom_col(
+    position = position_dodge(width = .75),
+    width = .65
+  ) +
+
+  geom_text(
+    aes(
+      x = perc + 5,
+      label = paste0(perc, "%")
+    ),
+    position = position_dodge(width = .75),
+    hjust = 0,
+    size = 2.5,
+    color = "black"
+  ) +
+
+  scale_x_continuous(
+    limits = c(0, max(atividades_prop$perc) + 12),
+    labels = function(x) paste0(x, "%"),
+    expand = expansion(mult = c(0, .02))
+  ) +
+
+  scale_fill_brewer(
+    palette = "Set2",
+    name = "Ano"
+  ) +
+
+  labs(
+    x = "",
+    y = "",
+    title = "",
+    subtitle = ""
+  ) +
+
+  theme_minimal(base_size = 13) +
+
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.y = element_blank()
+  )
+
+ggplotly(g, tooltip = "text")
+```
 
 
 ### Trabalho
 
 "emprego_formal", "emprego_informal", "estagio_nao_obrigatorio",
 
-### Participação social
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
 
-"coletivo_movimento", 
+# Variáveis de trabalho
+vars_trabalho <- c(
+  "emprego_formal",
+  "emprego_informal",
+  "estagio_nao_obrigatorio"
+)
+
+# Preparar os dados
+trabalho_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  select(ano, all_of(vars_trabalho)) %>%
+  pivot_longer(
+    cols = -ano,
+    names_to = "ocupacao",
+    values_to = "resposta"
+  ) %>%
+  filter(resposta == "Sim") %>%
+  count(ano, ocupacao) %>%
+  left_join(
+    perfil %>%
+      mutate(ano = substr(data_envio, 1, 4)) %>%
+      filter(ano %in% c("2024", "2025", "2026")) %>%
+      count(ano, name = "total"),
+    by = "ano"
+  ) %>%
+  mutate(
+    prop = n / total,
+    perc = round(prop * 100, 1)
+  )
+
+# Rótulos
+trabalho_prop$ocupacao <- factor(
+  trabalho_prop$ocupacao,
+  levels = vars_trabalho,
+  labels = c(
+    "Emprego formal",
+    "Emprego informal",
+    "Estágio não obrigatório"
+  )
+)
+
+# Gráfico
+g <- ggplot(
+  trabalho_prop,
+  aes(
+    x = perc,
+    y = ocupacao,
+    fill = ano,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Ocupação: ", ocupacao,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc, "%"
+    )
+  )
+) +
+
+  geom_col(
+    position = position_dodge(width = 0.75),
+    width = 0.65
+  ) +
+
+  geom_text(
+    aes(
+      x = perc + 3,
+      label = paste0(perc, "%")
+    ),
+    position = position_dodge(width = 0.75),
+    hjust = 0,
+    size = 3,
+    color = "black"
+  ) +
+
+  scale_x_continuous(
+    limits = c(0, max(trabalho_prop$perc) + 10),
+    labels = function(x) paste0(x, "%"),
+    expand = expansion(mult = c(0, 0.02))
+  ) +
+
+  scale_fill_brewer(
+    palette = "Set2",
+    name = "Ano"
+  ) +
+
+  labs(
+    x = "",
+    y = "",
+    title = "",
+    subtitle = ""
+  ) +
+
+  theme_minimal(base_size = 13) +
+
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.y = element_blank(),
+    axis.text.y = element_text(face = "bold"),
+    axis.text.x = element_text(size = 11)
+  )
+
+ggplotly(g, tooltip = "text")
+```
+
+
+### Participação social e política
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+# Preparar os dados
+coletivo_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  group_by(ano) %>%
+  summarise(
+    n = sum(coletivo_movimento == "Sim", na.rm = TRUE),
+    total = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    perc = round(100 * n / total, 1)
+  )
+
+# Gráfico
+g <- ggplot(
+  coletivo_prop,
+  aes(
+    x = ano,
+    y = perc,
+    fill = ano,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc, "%"
+    )
+  )
+) +
+
+  geom_col(
+    width = 0.6,
+    show.legend = FALSE
+  ) +
+
+  geom_text(
+    aes(label = paste0(perc, "%")),
+    vjust = -0.4,
+    size = 3.5
+  ) +
+
+  scale_y_continuous(
+    limits = c(0, max(coletivo_prop$perc) + 8),
+    labels = function(x) paste0(x, "%"),
+    expand = expansion(mult = c(0, 0.02))
+  ) +
+
+  scale_fill_brewer(palette = "Set2") +
+
+  labs(
+    x = "Ano",
+    y = "Percentual (%)",
+    title = "",
+    subtitle = ""
+  ) +
+
+  theme_minimal(base_size = 13) +
+
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "none",
+    axis.title.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold")
+  )
+
+ggplotly(g, tooltip = "text")
+```
+
 
 ### Esporte
 
+
 "esporte",
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+# Preparar os dados
+esporte_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  count(ano, esporte) %>%
+  left_join(
+    perfil %>%
+      mutate(ano = substr(data_envio, 1, 4)) %>%
+      filter(ano %in% c("2024", "2025", "2026")) %>%
+      count(ano, name = "total"),
+    by = "ano"
+  ) %>%
+  mutate(
+    perc = round(100 * n / total, 1)
+  )
+
+# Definir ordem das categorias
+esporte_prop$esporte <- factor(
+  esporte_prop$esporte,
+  levels = c(
+    "Não pratica",
+    "Pratica regularmente", 
+    "Pratica esporadicamente"
+  )
+)
+
+# Gráfico
+g <- ggplot(
+  esporte_prop,
+  aes(
+    x = esporte,
+    y = perc,
+    fill = ano,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Prática esportiva: ", esporte,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc, "%"
+    )
+  )
+) +
+
+  geom_col(
+    position = position_dodge(width = 0.75),
+    width = 0.65
+  ) +
+
+  geom_text(
+    aes(label = paste0(perc, "%")),
+    position = position_dodge(width = 0.75),
+    vjust = -0.4,
+    size = 3
+  ) +
+
+  scale_y_continuous(
+    limits = c(0, max(esporte_prop$perc) + 8),
+    labels = function(x) paste0(x, "%"),
+    expand = expansion(mult = c(0, 0.02))
+  ) +
+
+  scale_fill_brewer(
+    palette = "Set2",
+    name = "Ano"
+  ) +
+
+  labs(
+    x = "",
+    y = "Percentual (%)",
+    title = "",
+    subtitle = ""
+  ) +
+
+  theme_minimal(base_size = 13) +
+
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold")
+  )
+
+ggplotly(g, tooltip = "text")
+```
+
+
 
 ### Cultura
 
 "atividade_cultural",
 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+# Preparar os dados
+cult_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  count(ano, atividade_cultural) %>%
+  left_join(
+    perfil %>%
+      mutate(ano = substr(data_envio, 1, 4)) %>%
+      filter(ano %in% c("2024", "2025", "2026")) %>%
+      count(ano, name = "total"),
+    by = "ano"
+  ) %>%
+  mutate(
+    perc = round(100 * n / total, 1)
+  )
+
+# Definir ordem das categorias
+cult_prop$atividade_cultural <- factor(
+  cult_prop$atividade_cultural,
+  levels = c(
+    "Pratica esporadicamente", 
+    "Pratica regularmente", 
+    "Não pratica"
+  )
+)
+
+# Gráfico
+g <- ggplot(
+  cult_prop,
+  aes(
+    x = atividade_cultural,
+    y = perc,
+    fill = ano,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Prática cultural: ", atividade_cultural,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc, "%"
+    )
+  )
+) +
+
+  geom_col(
+    position = position_dodge(width = 0.75),
+    width = 0.65
+  ) +
+
+  geom_text(
+    aes(label = paste0(perc, "%")),
+    position = position_dodge(width = 0.75),
+    vjust = -0.4,
+    size = 3
+  ) +
+
+  scale_y_continuous(
+    limits = c(0, max(cult_prop$perc) + 8),
+    labels = function(x) paste0(x, "%"),
+    expand = expansion(mult = c(0, 0.02))
+  ) +
+
+  scale_fill_brewer(
+    palette = "Set2",
+    name = "Ano"
+  ) +
+
+  labs(
+    x = "",
+    y = "Percentual (%)",
+    title = "",
+    subtitle = ""
+  ) +
+
+  theme_minimal(base_size = 13) +
+
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold")
+  )
+
+ggplotly(g, tooltip = "text")
+```
+
+
 ### Religião
 
 "religiao_matriz_africana",
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+
+# Preparar os dados
+rel_prop <- perfil %>%
+  mutate(ano = substr(data_envio, 1, 4)) %>%
+  filter(ano %in% c("2024", "2025", "2026")) %>%
+  count(ano, religiao_matriz_africana) %>%
+  left_join(
+    perfil %>%
+      mutate(ano = substr(data_envio, 1, 4)) %>%
+      filter(ano %in% c("2024", "2025", "2026")) %>%
+      count(ano, name = "total"),
+    by = "ano"
+  ) %>%
+  mutate(
+    perc = round(100 * n / total, 1)
+  )
+
+# Definir ordem das categorias
+rel_prop$religiao_matriz_africana <- factor(
+  rel_prop$religiao_matriz_africana,
+  levels = c(
+    "Pratica esporadicamente", 
+    "Pratica regularmente", 
+    "Não pratica"
+  )
+)
+
+# Gráfico
+g <- ggplot(
+  rel_prop,
+  aes(
+    x = religiao_matriz_africana,
+    y = perc,
+    fill = ano,
+    text = paste0(
+      "Ano: ", ano,
+      "<br>Prática religião: ", religiao_matriz_africana,
+      "<br>Quantidade: ", n,
+      "<br>Proporção: ", perc, "%"
+    )
+  )
+) +
+
+  geom_col(
+    position = position_dodge(width = 0.75),
+    width = 0.65
+  ) +
+
+  geom_text(
+    aes(label = paste0(perc, "%")),
+    position = position_dodge(width = 0.75),
+    vjust = -0.4,
+    size = 3
+  ) +
+
+  scale_y_continuous(
+    limits = c(0, max(rel_prop$perc) + 8),
+    labels = function(x) paste0(x, "%"),
+    expand = expansion(mult = c(0, 0.02))
+  ) +
+
+  scale_fill_brewer(
+    palette = "Set2",
+    name = "Ano"
+  ) +
+
+  labs(
+    x = "",
+    y = "Percentual (%)",
+    title = "",
+    subtitle = ""
+  ) +
+
+  theme_minimal(base_size = 13) +
+
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold")
+  )
+
+ggplotly(g, tooltip = "text")
+```
+
 
 ### Pré-Vestibular
 
